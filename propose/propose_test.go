@@ -1,8 +1,8 @@
 package propose
 
 import (
-	"database/sql"
 	"loan-management/domain"
+	"loan-management/testhelper"
 	"testing"
 
 	"github.com/google/uuid"
@@ -31,7 +31,7 @@ func TestPropose(t *testing.T) {
 	})
 
 	t.Run("command saves the proposed state and returns correct ID", func(t *testing.T) {
-		db := setupDB(t)
+		db := testhelper.SetupDB(t)
 		repo := NewRepository(db)
 		service := NewCommand(repo)
 		id, err := service.Propose(request{
@@ -57,12 +57,4 @@ func TestPropose(t *testing.T) {
 		assert.Equal(t, 1000000, principalAmount)
 		assert.Equal(t, "proposed", state)
 	})
-}
-
-func setupDB(t *testing.T) *sql.DB {
-	db, err := sql.Open("sqlite3", ":memory:")
-	require.NoError(t, err)
-
-	db.Exec("CREATE TABLE loans (id UUID, borrower_id INTEGER, rate INTEGER, principal_amount INTEGER, state TEXT)")
-	return db
 }

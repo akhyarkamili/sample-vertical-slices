@@ -1,6 +1,8 @@
 package propose
 
 import (
+	"encoding/json"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,7 +22,7 @@ type httpRequest struct {
 
 func (h *Handler) Handle(ctx echo.Context) error {
 	var req httpRequest
-	if err := ctx.Bind(req); err != nil {
+	if err := json.NewDecoder(ctx.Request().Body).Decode(&req); err != nil {
 		return ctx.JSON(400, map[string]string{"error": "invalid request"})
 	}
 

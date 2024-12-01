@@ -16,10 +16,15 @@ func main() {
 		log.Fatalf("error reading config: %v", err)
 	}
 
-	start(cfg)
+	db, err := NewDB(cfg.ConnectionString)
+	if err != nil {
+		log.Fatalf("error connecting to db: %v", err)
+	}
+
+	start(cfg, db)
 }
 
-func start(cfg Config) {
+func start(cfg Config, db *sql.DB) {
 	e := echo.New()
 	e.GET("/healthz", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
@@ -27,11 +32,6 @@ func start(cfg Config) {
 			"port":   cfg.Port,
 		})
 	})
-
-	db, err := NewDB(cfg.ConnectionString)
-	if err != nil {
-		log.Fatalf("error connecting to db: %v", err)
-	}
 
 	repo := propose.NewRepository(db)
 	command := propose.NewCommand(repo)
