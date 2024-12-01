@@ -62,7 +62,7 @@ func TestServerApprove(t *testing.T) {
 
 	t.Run("approve endpoint exists and obeys contract", func(t *testing.T) {
 		// Arrange
-		proposeResp, err := http.Post("http://localhost:13005/propose", "application/json", strings.NewReader(`{"borrower_id": 1, "rate": 10, "principal_amount": 1000000}`))
+		proposeResp, err := http.Post("http://localhost:13005/", "application/json", strings.NewReader(`{"borrower_id": 1, "rate": 10, "principal_amount": 1000000}`))
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, proposeResp.StatusCode)
 		proposeBody, err := io.ReadAll(proposeResp.Body)
