@@ -1,0 +1,4 @@
+Here are a few assumptions that I made while writing this code:
+
+- Persistence is out of scope -- I've implemented app in-memory persistence using SQLite's in-memory DB.
+-
