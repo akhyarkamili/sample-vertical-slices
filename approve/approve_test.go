@@ -5,6 +5,7 @@ import (
 	"loan-management/testhelper"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,7 +28,7 @@ func TestApprove(t *testing.T) {
 		request := Request{
 			LoanID:     id,
 			EmployeeID: 1,
-			Proof:      "http://google.com",
+			Proof:      "https://google.com",
 		}
 		// Act
 		err = approveCmd.Approve(request)
@@ -57,5 +58,55 @@ func TestApprove(t *testing.T) {
 		require.NoError(t, rows.Err())
 		assert.Equal(t, 1, employeeID)
 		assert.Equal(t, "http://google.com", proof)
+	})
+
+	t.Run("command refuses invalid request", func(t *testing.T) {
+		// Arrange
+		approveCmd := NewCommand(nil)
+
+		tests := []struct {
+			name    string
+			request Request
+		}{
+			{
+				"empty request",
+				Request{},
+			},
+			{
+				"invalid url",
+				Request{
+					LoanID:     uuid.New(),
+					EmployeeID: 1,
+					Proof:      "abcde",
+				},
+			},
+			{
+				"invalid ID",
+				Request{
+					LoanID:     uuid.Nil,
+					EmployeeID: 1,
+					Proof:      "https://google.com",
+				},
+			},
+			{
+				"invalid employee ID",
+				Request{
+					LoanID:     uuid.New(),
+					EmployeeID: 0,
+					Proof:      "https://google.com",
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				// Act
+				err := approveCmd.Approve(tt.request)
+
+				// Assert
+				assert.Error(t, err)
+				assert.ErrorIs(t, err, ErrInvalidRequest)
+			})
+		}
 	})
 }
