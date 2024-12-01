@@ -23,10 +23,10 @@ type httpRequest struct {
 func (h *Handler) Handle(ctx echo.Context) error {
 	var req httpRequest
 	if err := json.NewDecoder(ctx.Request().Body).Decode(&req); err != nil {
-		return ctx.JSON(400, map[string]string{"error": "invalid request"})
+		return ctx.JSON(400, map[string]string{"error": "invalid Request"})
 	}
 
-	request := request{
+	request := Request{
 		BorrowerID:      req.BorrowerID,
 		Rate:            req.Rate,
 		PrincipalAmount: req.PrincipalAmount,

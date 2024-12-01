@@ -33,7 +33,7 @@ func NewRepository(db *sql.DB) Repository {
 	return &repo{db: db}
 }
 
-func (r *repo) Save(id uuid.UUID, l domain.Loan) error {
+func (r *repo) Create(id uuid.UUID, l domain.Loan) error {
 	loan := FromDomain(l)
 	loan.ID = id
 	_, err := r.db.Exec("INSERT INTO loans (id, borrower_id, rate, principal_amount, state) VALUES (?, ?, ?, ?, ?)", loan.ID, loan.BorrowerID, loan.Rate, loan.PrincipalAmount, loan.State)

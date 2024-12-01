@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Save(id uuid.UUID, loan domain.Loan) error
+	Create(id uuid.UUID, loan domain.Loan) error
 }
 
 type Command struct {
@@ -20,13 +20,13 @@ func NewCommand(repo Repository) *Command {
 	}
 }
 
-type request struct {
+type Request struct {
 	BorrowerID      int
 	Rate            int
 	PrincipalAmount int
 }
 
-func (r *request) Validate() error {
+func (r *Request) Validate() error {
 	if r.BorrowerID <= 0 {
 		return ErrInvalidBorrowerID
 	}
@@ -39,14 +39,14 @@ func (r *request) Validate() error {
 	return nil
 }
 
-func (ps *Command) Propose(request request) (loanID uuid.UUID, err error) {
+func (ps *Command) Propose(request Request) (loanID uuid.UUID, err error) {
 	if err := request.Validate(); err != nil {
 		return uuid.Nil, err
 	}
 	loan := domain.NewLoan(request.BorrowerID, request.Rate, request.PrincipalAmount)
 
 	loanID = uuid.New()
-	err = ps.repo.Save(loanID, *loan)
+	err = ps.repo.Create(loanID, *loan)
 	if err != nil {
 		return uuid.Nil, err
 	}

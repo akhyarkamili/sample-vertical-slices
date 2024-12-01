@@ -14,7 +14,7 @@ import (
 
 type mockRepository struct{}
 
-func (mr *mockRepository) Save(_ uuid.UUID, _ domain.Loan) error {
+func (mr *mockRepository) Create(_ uuid.UUID, _ domain.Loan) error {
 	return nil
 }
 
@@ -22,7 +22,7 @@ func TestPropose(t *testing.T) {
 	t.Run("propose exists", func(t *testing.T) {
 		repo := &mockRepository{}
 		service := NewCommand(repo)
-		_, err := service.Propose(request{
+		_, err := service.Propose(Request{
 			BorrowerID:      1,
 			Rate:            10,
 			PrincipalAmount: 1000000,
@@ -34,7 +34,7 @@ func TestPropose(t *testing.T) {
 		db := testhelper.SetupDB(t)
 		repo := NewRepository(db)
 		service := NewCommand(repo)
-		id, err := service.Propose(request{
+		id, err := service.Propose(Request{
 			BorrowerID:      1,
 			Rate:            10,
 			PrincipalAmount: 1000000,
