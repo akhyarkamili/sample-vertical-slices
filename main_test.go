@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -37,13 +39,20 @@ func TestServerPropose(t *testing.T) {
 			return false
 		}
 		return resp.StatusCode == http.StatusOK
-	}, 1*time.Second, 200*time.Millisecond)
+	}, 200*time.Millisecond, 50*time.Millisecond)
 
-	t.Run("propose endpoint exists", func(t *testing.T) {
-		time.AfterFunc(1*time.Second, func() {
+	t.Run("propose endpoint exists and obeys contract", func(t *testing.T) {
+		time.AfterFunc(200*time.Millisecond, func() {
 			resp, err := http.Post("http://localhost:13004/propose", "application/json", strings.NewReader(`{"borrower_id": 1, "rate": 10, "principal_amount": 1000000}`))
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			body, err := io.ReadAll(resp.Body)
+			require.NoError(t, err)
+
+			var response map[string]interface{}
+			require.NoError(t, json.Unmarshal(body, &response))
+			assert.Equal(t, true, response["success"])
+			assert.NotEmpty(t, response["id"])
 		})
 	})
 }

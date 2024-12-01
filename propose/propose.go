@@ -2,10 +2,12 @@ package propose
 
 import (
 	"loan-management/domain"
+
+	"github.com/google/uuid"
 )
 
 type Repository interface {
-	Save(loan domain.Loan) error
+	Save(id uuid.UUID, loan domain.Loan) error
 }
 
 type Command struct {
@@ -37,10 +39,17 @@ func (r *request) Validate() error {
 	return nil
 }
 
-func (ps *Command) Propose(request request) error {
+func (ps *Command) Propose(request request) (loanID uuid.UUID, err error) {
 	if err := request.Validate(); err != nil {
-		return err
+		return uuid.Nil, err
 	}
 	loan := domain.NewLoan(request.BorrowerID, request.Rate, request.PrincipalAmount)
-	return ps.repo.Save(*loan)
+
+	loanID = uuid.New()
+	err = ps.repo.Save(loanID, *loan)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return loanID, nil
 }

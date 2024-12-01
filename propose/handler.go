@@ -30,9 +30,13 @@ func (h *Handler) Handle(ctx echo.Context) error {
 		PrincipalAmount: req.PrincipalAmount,
 	}
 
-	if err := h.cmd.Propose(request); err != nil {
+	id, err := h.cmd.Propose(request)
+	if err != nil {
 		return ctx.JSON(500, map[string]string{"error": "internal server error"})
 	}
 
-	return ctx.JSON(200, map[string]string{"status": "ok"})
+	return ctx.JSON(200, map[string]any{
+		"success": true,
+		"id":      id.String(),
+	})
 }
