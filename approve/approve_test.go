@@ -57,7 +57,7 @@ func TestApprove(t *testing.T) {
 		}
 		require.NoError(t, rows.Err())
 		assert.Equal(t, 1, employeeID)
-		assert.Equal(t, "http://google.com", proof)
+		assert.Equal(t, "https://google.com", proof)
 	})
 
 	t.Run("command refuses invalid request", func(t *testing.T) {

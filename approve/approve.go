@@ -16,16 +16,16 @@ type Command struct {
 	repo Repository
 }
 
-func NewCommand(repo Repository) *Command {
-	return &Command{
+func NewCommand(repo Repository) Command {
+	return Command{
 		repo: repo,
 	}
 }
 
 type Request struct {
-	LoanID     uuid.UUID `validate:"required"`
-	EmployeeID int       `validate:"required"`
-	Proof      string    `validate:"required,url"`
+	LoanID     uuid.UUID `json:"id" validate:"required"`
+	EmployeeID int       `json:"employee_id" validate:"required"`
+	Proof      string    `json:"proof" validate:"required,url"`
 }
 
 func (r *Request) Validate() error {

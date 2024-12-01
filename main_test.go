@@ -72,7 +72,7 @@ func TestServerApprove(t *testing.T) {
 		id := jsonResult["id"].(string)
 
 		// Act
-		s := `{"id": "` + strings.TrimSpace(id) + `"}`
+		s := `{"id": "` + strings.TrimSpace(id) + `", "employee_id": 1, "proof": "https://google.com"}`
 		resp, err := http.Post("http://localhost:13005/approve", "application/json", strings.NewReader(s))
 		require.NoError(t, err)
 		body, err := io.ReadAll(resp.Body)

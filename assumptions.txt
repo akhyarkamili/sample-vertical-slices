@@ -1,4 +1,4 @@
 Here are a few assumptions that I made while writing this code:
 
 - Persistence is out of scope -- I've implemented app in-memory persistence using SQLite's in-memory DB.
--
+- Images, files, are inputted to the system as URLs, actual uploads are assumed to be delegated elsewhere.
