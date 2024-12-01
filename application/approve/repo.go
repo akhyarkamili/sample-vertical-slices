@@ -33,7 +33,7 @@ func (r repo) Get(id uuid.UUID) (domain.Loan, error) {
 		return domain.Loan{}, err
 	}
 
-	return domain.Load(borrowerID, rate, principalAmount, state, nil), nil
+	return domain.Load(borrowerID, rate, principalAmount, state, nil, nil), nil
 }
 
 func (r repo) SaveApproval(id uuid.UUID, loan domain.Loan) error {

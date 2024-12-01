@@ -1,4 +1,4 @@
-package approve
+package common
 
 import "errors"
 

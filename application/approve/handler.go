@@ -3,6 +3,7 @@ package approve
 import (
 	"encoding/json"
 	"errors"
+	"loan-management/application/common"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -26,7 +27,7 @@ func (h *Handler) Handle(ctx echo.Context) error {
 
 	err := h.cmd.Approve(req)
 	if err != nil {
-		if errors.Is(err, ErrInvalidRequest) {
+		if errors.Is(err, common.ErrInvalidRequest) {
 			return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
 		}
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "internal server error"})

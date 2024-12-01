@@ -38,7 +38,7 @@ func TestServerPropose(t *testing.T) {
 	time.Sleep(200 * time.Millisecond)
 
 	t.Run("propose endpoint exists and obeys contract", func(t *testing.T) {
-		resp, err := http.Post("http://localhost:13004/propose", "application/json", strings.NewReader(`{"borrower_id": 1, "rate": 10, "principal_amount": 1000000}`))
+		resp, err := http.Post("http://localhost:13004/", "application/json", strings.NewReader(`{"borrower_id": 1, "rate": 10, "principal_amount": 1000000}`))
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		body, err := io.ReadAll(resp.Body)

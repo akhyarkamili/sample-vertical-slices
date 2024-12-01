@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"loan-management/approve"
-	"loan-management/propose"
+	"loan-management/application/approve"
+	"loan-management/application/propose"
 	"log"
 	"net/http"
 
@@ -48,7 +48,7 @@ func registerPropose(db *sql.DB, e *echo.Echo) {
 	repo := propose.NewRepository(db)
 	command := propose.NewCommand(repo)
 	proposeHandler := propose.NewHandler(command)
-	e.POST("/propose", proposeHandler.Handle)
+	e.POST("/", proposeHandler.Handle)
 }
 
 func registerApprove(db *sql.DB, e *echo.Echo) {

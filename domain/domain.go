@@ -2,13 +2,12 @@ package domain
 
 import "github.com/shopspring/decimal"
 
-type Rupiah decimal.Decimal
-
 type state int
 
 const (
 	stateProposed state = iota
 	stateApproved
+	stateInvested
 )
 
 func (ls state) String() string {
@@ -17,6 +16,8 @@ func (ls state) String() string {
 		return "proposed"
 	case stateApproved:
 		return "approved"
+	case stateInvested:
+		return "invested"
 	}
 	return "unknown"
 }
@@ -27,6 +28,8 @@ func fromString(s string) state {
 		return stateProposed
 	case "approved":
 		return stateApproved
+	case "invested":
+		return stateInvested
 	}
 	return -1
 }
@@ -36,12 +39,18 @@ type Approval struct {
 	EmployeeID int
 }
 
+type Investment struct {
+	amount     decimal.Decimal
+	investorID int
+}
+
 type Loan struct {
 	BorrowerID      int
 	Rate            int
-	PrincipalAmount Rupiah
+	PrincipalAmount decimal.Decimal
 
-	Approval *Approval
+	Investments []Investment
+	Approval    *Approval
 
 	state state
 }
@@ -50,16 +59,16 @@ func NewLoan(borrowerID, rate int, principalAmount int) *Loan {
 	return &Loan{
 		BorrowerID:      borrowerID,
 		Rate:            rate,
-		PrincipalAmount: Rupiah(decimal.NewFromInt(int64(principalAmount))),
+		PrincipalAmount: decimal.Decimal(decimal.NewFromInt(int64(principalAmount))),
 		state:           stateProposed,
 	}
 }
 
-func Load(borrowerID, rate, principalAmount int, state string, approval *Approval) Loan {
+func Load(borrowerID, rate, principalAmount int, state string, approval *Approval, investments []Investment) Loan {
 	return Loan{
 		BorrowerID:      borrowerID,
 		Rate:            rate,
-		PrincipalAmount: Rupiah(decimal.NewFromInt(int64(principalAmount))),
+		PrincipalAmount: decimal.NewFromInt(int64(principalAmount)),
 		state:           fromString(state),
 		Approval:        approval,
 	}
@@ -78,4 +87,37 @@ func (l *Loan) Approve(proof string, employeeID int) {
 		Proof:      proof,
 		EmployeeID: employeeID,
 	}
+}
+
+func (l *Loan) Invest(amount decimal.Decimal, investorID int) (overflow decimal.Decimal) {
+	if l.state != stateApproved {
+		return
+	}
+
+	available := l.PrincipalAmount.Sub(l.TotalInvested())
+	investmentAmount := decimal.Min(available, amount)
+
+	i := Investment{amount: investmentAmount, investorID: investorID}
+	l.Investments = append(l.Investments, i)
+
+	if l.TotalInvested().Equal(l.PrincipalAmount) {
+		l.MarkInvested()
+	}
+
+	return amount.Sub(investmentAmount)
+}
+
+func (l *Loan) TotalInvested() decimal.Decimal {
+	var total decimal.Decimal
+	for _, inv := range l.Investments {
+		total = total.Add(inv.amount)
+	}
+	return total
+}
+
+func (l *Loan) MarkInvested() {
+	if l.state != stateApproved {
+		return
+	}
+	l.state = stateInvested
 }

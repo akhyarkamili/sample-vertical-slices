@@ -1,7 +1,8 @@
 package approve
 
 import (
-	"loan-management/propose"
+	"loan-management/application/common"
+	"loan-management/application/propose"
 	"loan-management/testhelper"
 	"testing"
 
@@ -105,7 +106,7 @@ func TestApprove(t *testing.T) {
 
 				// Assert
 				assert.Error(t, err)
-				assert.ErrorIs(t, err, ErrInvalidRequest)
+				assert.ErrorIs(t, err, common.ErrInvalidRequest)
 			})
 		}
 	})

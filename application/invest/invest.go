@@ -1,4 +1,4 @@
-package approve
+package invest
 
 import (
 	"loan-management/application/common"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Repository interface {
 	Get(loanID uuid.UUID) (domain.Loan, error)
-	SaveApproval(id uuid.UUID, loan domain.Loan) error
+	SaveInvestments(id uuid.UUID, loan domain.Loan) error
 }
 
 type Command struct {
@@ -24,25 +25,25 @@ func NewCommand(repo Repository) Command {
 }
 
 type Request struct {
-	LoanID     uuid.UUID `json:"id" validate:"required"`
-	EmployeeID int       `json:"employee_id" validate:"required"`
-	Proof      string    `json:"proof" validate:"required,url"`
+	LoanID     uuid.UUID       `json:"id" validate:"required"`
+	InvestorID int             `json:"investor_id" validate:"required"`
+	Amount     decimal.Decimal `json:"amount" validate:"required"`
 }
 
 func (r *Request) Validate() error {
 	return validator.New().Struct(r)
 }
 
-func (ps *Command) Approve(req Request) error {
+func (cmd *Command) Invest(req Request) error {
 	if err := req.Validate(); err != nil {
 		return common.ErrInvalidRequest
 	}
 
-	loan, err := ps.repo.Get(req.LoanID)
+	loan, err := cmd.repo.Get(req.LoanID)
 	if err != nil {
 		return err
 	}
 
-	loan.Approve(req.Proof, req.EmployeeID)
-	return ps.repo.SaveApproval(req.LoanID, loan)
+	loan.Invest(req.Amount, req.InvestorID)
+	return cmd.repo.SaveInvestments(req.LoanID, loan)
 }
