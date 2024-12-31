@@ -8,7 +8,6 @@ import (
 )
 
 func TestLoan_Invest(t *testing.T) {
-
 	t.Run("valid investment", func(t *testing.T) {
 		loan := NewLoan(1, 10, 1000000)
 		loan.Approve("https://google.com/valid_proof", 1)

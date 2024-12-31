@@ -24,8 +24,8 @@ func (m *mockRepository) SaveInvestments(id uuid.UUID, loan domain.Loan) error {
 	return nil
 }
 
-func TestApprove(t *testing.T) {
-	t.Run("command invests without an error", func(t *testing.T) {
+func TestInvest(t *testing.T) {
+	t.Run("command invests and persists correctly", func(t *testing.T) {
 		// Arrange
 		db := testhelper.SetupDB(t)
 		proposeRepo := propose.NewRepository(db)
@@ -45,20 +45,23 @@ func TestApprove(t *testing.T) {
 			Proof:      "https://google.com",
 		}
 		err = approveCmd.Approve(approveReq)
+		require.NoError(t, err)
 
 		// Act
-		repo := &mockRepository{}
-		investCmd := NewCommand(repo)
+		investRepo := NewRepository(db)
+		investCmd := NewCommand(investRepo)
 		request := Request{
 			LoanID:     id,
 			InvestorID: 1,
 			Amount:     decimal.NewFromInt32(5000),
 		}
-		// Act
 		err = investCmd.Invest(request)
+		require.NoError(t, err)
 
 		// Assert
-		assert.NoError(t, err)
-
+		var investedAmount decimal.Decimal
+		err = db.QueryRow("SELECT SUM(amount) FROM investments WHERE loan_id = ?", id).Scan(&investedAmount)
+		require.NoError(t, err)
+		assert.Equal(t, request.Amount, investedAmount)
 	})
 }

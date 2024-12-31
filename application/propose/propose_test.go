@@ -52,6 +52,7 @@ func TestPropose(t *testing.T) {
 			require.NoError(t, err)
 		}
 		require.NoError(t, rows.Err())
+
 		assert.Equal(t, 1, borrowerID)
 		assert.Equal(t, 10, rate)
 		assert.Equal(t, 1000000, principalAmount)

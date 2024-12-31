@@ -40,8 +40,8 @@ type Approval struct {
 }
 
 type Investment struct {
-	amount     decimal.Decimal
-	investorID int
+	Amount     decimal.Decimal
+	InvestorID int
 }
 
 type Loan struct {
@@ -59,7 +59,7 @@ func NewLoan(borrowerID, rate int, principalAmount int) *Loan {
 	return &Loan{
 		BorrowerID:      borrowerID,
 		Rate:            rate,
-		PrincipalAmount: decimal.Decimal(decimal.NewFromInt(int64(principalAmount))),
+		PrincipalAmount: decimal.NewFromInt(int64(principalAmount)),
 		state:           stateProposed,
 	}
 }
@@ -97,7 +97,7 @@ func (l *Loan) Invest(amount decimal.Decimal, investorID int) (overflow decimal.
 	available := l.PrincipalAmount.Sub(l.TotalInvested())
 	investmentAmount := decimal.Min(available, amount)
 
-	i := Investment{amount: investmentAmount, investorID: investorID}
+	i := Investment{Amount: investmentAmount, InvestorID: investorID}
 	l.Investments = append(l.Investments, i)
 
 	if l.TotalInvested().Equal(l.PrincipalAmount) {
@@ -110,7 +110,7 @@ func (l *Loan) Invest(amount decimal.Decimal, investorID int) (overflow decimal.
 func (l *Loan) TotalInvested() decimal.Decimal {
 	var total decimal.Decimal
 	for _, inv := range l.Investments {
-		total = total.Add(inv.amount)
+		total = total.Add(inv.Amount)
 	}
 	return total
 }
