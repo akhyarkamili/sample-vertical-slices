@@ -1,7 +1,6 @@
 package invest
 
 import (
-	"encoding/json"
 	"errors"
 	"loan-management/application/common"
 	"net/http"
@@ -21,7 +20,7 @@ func NewHandler(cmd Command) *Handler {
 
 func (h *Handler) Handle(ctx echo.Context) error {
 	var req Request
-	if err := json.NewDecoder(ctx.Request().Body).Decode(&req); err != nil {
+	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
 	}
 

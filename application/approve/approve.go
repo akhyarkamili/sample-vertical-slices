@@ -24,7 +24,7 @@ func NewCommand(repo Repository) Command {
 }
 
 type Request struct {
-	LoanID     uuid.UUID `json:"id" validate:"required"`
+	LoanID     uuid.UUID `param:"loan_id" validate:"required"`
 	EmployeeID int       `json:"employee_id" validate:"required"`
 	Proof      string    `json:"proof" validate:"required,url"`
 }

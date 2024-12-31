@@ -112,11 +112,11 @@ func TestApprove(t *testing.T) {
 		require.NoError(t, err)
 		jsonResult := map[string]interface{}{}
 		require.NoError(t, json.Unmarshal(proposeBody, &jsonResult))
-		id := jsonResult["id"].(string)
+		id := strings.TrimSpace(jsonResult["id"].(string))
 
 		// Act
-		s := `{"id": "` + strings.TrimSpace(id) + `", "employee_id": 1, "proof": "https://google.com"}`
-		resp, err := http.Post("http://localhost:13005/approve", "application/json", strings.NewReader(s))
+		s := `{"employee_id": 1, "proof": "https://google.com"}`
+		resp, err := http.Post("http://localhost:13005/approve/"+id, "application/json", strings.NewReader(s))
 		require.NoError(t, err)
 		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)
@@ -147,13 +147,13 @@ func TestInvest(t *testing.T) {
 		require.NoError(t, err)
 		jsonResult := map[string]interface{}{}
 		require.NoError(t, json.Unmarshal(proposeBody, &jsonResult))
-		id := jsonResult["id"].(string)
-		s := `{"id": "` + strings.TrimSpace(id) + `", "employee_id": 1, "proof": "https://google.com"}`
-		_, err = http.Post("http://localhost:13007/approve", "application/json", strings.NewReader(s))
+		id := strings.TrimSpace(jsonResult["id"].(string))
+		s := `{"employee_id": 1, "proof": "https://google.com"}`
+		_, err = http.Post("http://localhost:13007/approve/"+id, "application/json", strings.NewReader(s))
 		require.NoError(t, err)
 
-		investRequest := `{"id": "` + strings.TrimSpace(id) + `", "amount": 100000, "investor_id": 1}`
-		resp, err := http.Post("http://localhost:13007/invest", "application/json", strings.NewReader(investRequest))
+		investRequest := `{"amount": 100000, "investor_id": 1}`
+		resp, err := http.Post("http://localhost:13007/invest/"+id, "application/json", strings.NewReader(investRequest))
 		require.NoError(t, err)
 		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)

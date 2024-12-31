@@ -64,14 +64,14 @@ func registerApprove(db *sql.DB, e *echo.Echo) {
 	repo := approve.NewRepository(db)
 	command := approve.NewCommand(repo)
 	approveHandler := approve.NewHandler(command)
-	e.POST("/approve", approveHandler.Handle)
+	e.POST("/approve/:loan_id", approveHandler.Handle)
 }
 
 func registerInvest(db *sql.DB, e *echo.Echo) {
 	repo := invest.NewRepository(db)
 	command := invest.NewCommand(repo)
 	investHandler := invest.NewHandler(command)
-	e.POST("/invest", investHandler.Handle)
+	e.POST("/invest/:loan_id", investHandler.Handle)
 }
 
 func NewDB() (*sql.DB, error) {
