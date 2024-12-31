@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"loan-management/application/approve"
+	"loan-management/application/invest"
+	loan_query "loan-management/application/loan-query"
 	"loan-management/application/propose"
 	"log"
 	"net/http"
@@ -40,6 +42,8 @@ func start(cfg Config, db *sql.DB) {
 
 	registerPropose(db, e)
 	registerApprove(db, e)
+	registerLoanQuery(db, e)
+	registerInvest(db, e)
 
 	e.Logger.Fatal(e.Start(":" + cfg.Port))
 }
@@ -51,6 +55,11 @@ func registerPropose(db *sql.DB, e *echo.Echo) {
 	e.POST("/", proposeHandler.Handle)
 }
 
+func registerLoanQuery(db *sql.DB, e *echo.Echo) {
+	queryHandler := loan_query.NewHandler(db)
+	e.GET("/:loan_id", queryHandler.Handle)
+}
+
 func registerApprove(db *sql.DB, e *echo.Echo) {
 	repo := approve.NewRepository(db)
 	command := approve.NewCommand(repo)
@@ -58,10 +67,27 @@ func registerApprove(db *sql.DB, e *echo.Echo) {
 	e.POST("/approve", approveHandler.Handle)
 }
 
+func registerInvest(db *sql.DB, e *echo.Echo) {
+	repo := invest.NewRepository(db)
+	command := invest.NewCommand(repo)
+	investHandler := invest.NewHandler(command)
+	e.POST("/invest", investHandler.Handle)
+}
+
 func NewDB() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		return nil, err
 	}
+
+	db.Exec("CREATE TABLE loans (id UUID, borrower_id INTEGER, rate INTEGER, principal_amount INTEGER, state TEXT)")
+	db.Exec(`CREATE TABLE loan_approvals (loan_id UUID, employee_id INTEGER, proof TEXT)`)
+	db.Exec(`CREATE TABLE investments (
+		id SERIAL PRIMARY KEY,
+		loan_id UUID REFERENCES loans(id),
+		amount INTEGER,
+		investor_id INT
+	);`)
+
 	return db, nil
 }
