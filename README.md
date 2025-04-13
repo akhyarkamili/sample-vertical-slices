@@ -1,6 +1,6 @@
-# AMARTHA TEST - LOAN MANAGEMENT
+# Sample Vertical Slices for a Loan App
 
-I've built the system for proposing new loans, approving new loans, and partially implemented investing (domain logic + command logic only).
+The system supports proposing new loans, approving new loans, and partially implemented investing (domain logic + command logic only).
 
 The APIs already available are the following, and uses JSON as their body:
 
